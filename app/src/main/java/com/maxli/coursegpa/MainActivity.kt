@@ -1,5 +1,6 @@
 package com.maxli.coursegpa
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -50,7 +51,7 @@ val TimesNewRoman = FontFamily(
 )
 
 
-val answered = MutableList(10) {false}
+//val answered = MutableList(10) {false}
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -83,6 +84,18 @@ fun TriviaScreen(
     val questions by viewModel.allQuestions.observeAsState(emptyList())
     var questionIndex by remember { mutableIntStateOf(0) }
 
+
+    var grade by remember { mutableDoubleStateOf(0.0) }
+    var questionsAnswered by remember { mutableDoubleStateOf(0.0) }
+    var questionsCorrect by remember { mutableDoubleStateOf(0.0) }
+
+
+    val answered = remember {
+        mutableStateListOf<Boolean>().apply {
+            repeat(10) { add(false) }
+        }
+    }
+
     if (questions.isEmpty()) {
         Text("No questions in database")
         return
@@ -98,11 +111,22 @@ fun TriviaScreen(
 
         QuestionBox(current, questionIndex)
         Spacer(modifier = Modifier.height(8.dp))
-        Score()
+        Score(grade)
+        AnswerButtons(
+            current,
+            questionIndex = questionIndex,
+            answered,
+            onAnswered = { isCorrect ->
+                if (!answered[questionIndex]) {
+                    answered[questionIndex] = true
+                    questionsAnswered++
+                    if (isCorrect) {
+                        questionsCorrect++
+                    }
+                }
+                grade = questionsCorrect / questionsAnswered
+            })
 
-        AnswerButtons(current) {
-            questionIndex = (questionIndex + 1) % questions.size
-        }
 
         Spacer(modifier = Modifier.height(50.dp))
 
@@ -117,24 +141,33 @@ fun TriviaScreen(
             },
             onReset = {
                 questionIndex = 0
+                questionsAnswered = 0.0
+                questionsCorrect = 0.0
+                answered.fill(false)
+                grade = 0.0
             }
         )
-
     }
 }
 
 
 
+
 @Composable
-fun AnswerButtons(question: TrivialQuestion, onAnswered: () -> Unit) {
-    var originalList = question.getShuffledAnswers()
-    AnswerRow("A", originalList[0], onAnswered)
+fun AnswerButtons(
+    question: TrivialQuestion,
+    questionIndex: Int,
+    answered: MutableList<Boolean>,
+    onAnswered: (isCorrect: Boolean) -> Unit
+) {
+    val originalList = question.getShuffledAnswers()
+    AnswerRow("A", originalList[0], questionIndex, 0, originalList, question, answered, onAnswered)
     Spacer(modifier = Modifier.height(25.dp))
-    AnswerRow("B", originalList[1], onAnswered)
+    AnswerRow("B", originalList[1], questionIndex,1, originalList, question, answered, onAnswered)
     Spacer(modifier = Modifier.height(25.dp))
-    AnswerRow("C", originalList[2], onAnswered)
+    AnswerRow("C", originalList[2], questionIndex,2, originalList, question, answered, onAnswered)
     Spacer(modifier = Modifier.height(25.dp))
-    AnswerRow("D", originalList[3], onAnswered)
+    AnswerRow("D", originalList[3], questionIndex,3, originalList, question, answered, onAnswered)
 }
 
 @Composable
@@ -159,7 +192,14 @@ fun QuestionBox(question: TrivialQuestion, index: Int) {
 }
 
 @Composable
-fun AnswerRow(label: String, text: String, onAnswered: () -> Unit) {
+fun AnswerRow(label: String,
+              text: String,
+              questionIndex: Int,
+              listIndex: Int,
+              answerIndex: List<String>,
+              question: TrivialQuestion,
+              answered: List<Boolean>,
+              onAnswered: (isCorrect: Boolean) -> Unit) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -169,11 +209,16 @@ fun AnswerRow(label: String, text: String, onAnswered: () -> Unit) {
     ) {
         Button(
             onClick = {
-                onAnswered()
+                val isCorrect = answerIndex[listIndex] == question.correct
+                onAnswered(isCorrect)
             },
             colors = ButtonDefaults.buttonColors(
-                containerColor = Color(0xFF97CDEC),
+                containerColor = if (answered[questionIndex] && answerIndex[listIndex] == question.correct) Color.Green//Color(0xFF97CDEC),
+                        else if (answered[questionIndex] && answerIndex[listIndex] != question.correct) Color.Red
+                        else
+                            Color(0xFF97CDEC),
                 contentColor = Color(0xFF1A2C57)
+
             ),
             shape = CircleShape,
             modifier = Modifier.size(50.dp)
@@ -314,8 +359,9 @@ fun BackForwardReset(
     }
 }
 
+@SuppressLint("DefaultLocale")
 @Composable
-fun Score() {
+fun Score(grade: Double) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -324,7 +370,7 @@ fun Score() {
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Text(
-            text = "Grade: ",
+            text = "Grade:  +${String.format("%.2f",grade*100)}%",
             fontFamily = TimesNewRoman,
             style = TextStyle(
                 fontSize = 25.sp,
