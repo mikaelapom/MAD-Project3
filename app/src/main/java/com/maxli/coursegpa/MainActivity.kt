@@ -370,7 +370,7 @@ fun Score(grade: Double) {
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Text(
-            text = "Grade:  +${String.format("%.2f",grade*100)}%",
+            text = "Grade:  ${String.format("%.2f",grade*100)}%",
             fontFamily = TimesNewRoman,
             style = TextStyle(
                 fontSize = 25.sp,
