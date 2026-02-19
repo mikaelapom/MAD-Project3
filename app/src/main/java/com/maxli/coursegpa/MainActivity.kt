@@ -23,6 +23,8 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.Tab
+import androidx.compose.material3.TabRow
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.ui.Alignment
@@ -63,15 +65,71 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             MyApplicationTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    TriviaScreen(
-                        viewModel = viewModel,
-                        modifier = Modifier.padding(innerPadding)
+                MainScreen(viewModel = viewModel)
+            }
+        }
+
+    }
+}
+
+@Composable
+fun MainScreen(viewModel: MainViewModel) {
+    var selectedTabIndex by remember { mutableIntStateOf(0) }
+    val tabs = listOf("Trivia", "Acad")
+
+    Scaffold(
+        modifier = Modifier.fillMaxSize(),
+        topBar = {
+            TabRow(
+                selectedTabIndex = selectedTabIndex,
+                containerColor = Color(0xFFFBE475),
+                contentColor = Color(0xFF1A2C57)
+            ) {
+                tabs.forEachIndexed { index, title ->
+                    Tab(
+                        selected = selectedTabIndex == index,
+                        onClick = { selectedTabIndex = index },
+                        text = {
+                            Text(
+                                text = title,
+                                style = TextStyle(
+                                    fontFamily = TimesNewRoman,
+                                    fontSize = 18.sp,
+                                    fontWeight = FontWeight.Bold
+                                )
+                            )
+                        }
                     )
                 }
             }
         }
+    ) { innerPadding ->
+        when (selectedTabIndex) {
+            0 -> TriviaScreen(
+                viewModel = viewModel,
+                modifier = Modifier.padding(innerPadding)
+            )
+            1 -> AcadScreen(
+                modifier = Modifier.padding(innerPadding)
+            )
+        }
+    }
+}
 
+@Composable
+fun AcadScreen(modifier: Modifier = Modifier) {
+    Box(
+        modifier = modifier.fillMaxSize(),
+        contentAlignment = Alignment.Center
+    ) {
+        Text(
+            text = "Acad Screen",
+            style = TextStyle(
+                fontFamily = TimesNewRoman,
+                fontSize = 30.sp,
+                color = Color(0xFF1A2C57)
+            )
+        )
     }
 }
 
