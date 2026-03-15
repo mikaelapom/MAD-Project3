@@ -1,7 +1,7 @@
 # MAD-Project3
 
 Notable figures:
-- Nancy Reagan: 
+- Nancy Reagan: Former first lady of the U.S who graduated from Smith with a degree in Drama and English in 1943. Before becoming first lady, she pursued her acting career, appearing in Donovan's Brain, The Next Voice You Hear, and Night Into Morning. As first lady, she launched the "Just Say No" campaign to oppose drug use in America's youth, The Foster Grandparent's Program to connect senior citizens to children with disabilities, and actively supported Vietnam War veterans through donations and hospital visitations. 
   
 - Sylvia Plath: A renowned poet and novelist who graduated from smith in 1951 with a degree in English. She was on the Editorial Board of the Campus Cat, editor of the Smith Review, and secretary of the Honor Board. She also won two Smith prizes for her poetry. Plath went on to publish an abundance of wildly famous works such as The Bell Jar, The Colossus and Other Poems, and Ariel. In 1982, she won the Posthumus Pulitzer Prize for her work "The Collected Poems".
   
